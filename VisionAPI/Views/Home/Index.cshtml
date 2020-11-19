@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="res">
+    <div class="alert alert-info text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert.</div>
+    <fieldset class="border p-2">
+        <legend class="w-auto">Bild analysieren</legend>
+        <div class="px-3 mt-2" id="portrait">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input id="inputpic" type="file" accept="image/*" />
+                    <small>Unterstützte Bilddatei: "jpeg, png, gif", maximale Dateigröße: 5MB</small>
+                </div>
+                <input type="button" class="btn btn-sm btn-primary" id="uploadpic" value="Hochladen" />
+                <input type="button" class="btn btn-sm btn-danger" id="deletepic" value="Löschen" />
+            </form>
+        </div>
+    </fieldset>
+</div>
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content p-3">
+            <div id="modal-content" class="text-center">
+                <div class="spinner-border" role="status">
+                </div>
+                <h4>Das Bild wird analysiert</h4>
+                <p>Bitte um etwas Geduld!</p>
+            </div>
+        </div>
+    </div>
+</div>

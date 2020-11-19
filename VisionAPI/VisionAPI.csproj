@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>858a0b95-e4ca-45c8-90a3-7b35cb60f5b8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

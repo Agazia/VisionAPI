@@ -1,0 +1,25 @@
+﻿@model ImageAnalysisVM
+
+<div>
+    <div class="alert alert-info text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert.</div>
+    <fieldset class="border p-2">
+        <legend class="w-auto">Bild analysieren</legend>
+        <div class="px-3 mt-2" id="portrait">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input id="inputpic" type="file" accept="image/*" />
+                    <small>Unterstützte Bilddatei: "jpeg, png, gif", maximale Dateigröße: 5MB</small>
+                </div>
+                <input type="button" class="btn btn-sm btn-primary" id="uploadpic" value="Hochladen" />
+                <input type="button" class="btn btn-sm btn-danger" id="deletepic" value="Löschen" />
+            </form>
+        </div>
+    </fieldset>
+</div>
+
+<div id="result" class="card mx-auto mt-2 shadow">
+    <img id="mypic" class="card-img-top" src="/img/pic.png" alt="Card image cap">
+    <div class="card-body text-center">
+        <p class="card-text">@Model.ImageAnalysis.Description.Captions.FirstOrDefault().Text</p>
+    </div>
+</div>
