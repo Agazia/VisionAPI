@@ -1,22 +1,5 @@
 ﻿@model ImageAnalysisVM
 
-<div>
-    <div class="alert alert-info text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert.</div>
-    <fieldset class="border p-2">
-        <legend class="w-auto">Bild analysieren</legend>
-        <div class="px-3 mt-2" id="portrait">
-            <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <input class="card p-2" id="inputpic" type="file" accept="image/*" />
-                    <small>Unterstützte Bilddatei: "jpeg, png, gif", maximale Dateigröße: 5MB</small>
-                </div>
-                <input type="button" class="btn btn-sm btn-primary uploadpic" id="uploadpic" value="Hochladen" />
-                <input type="button" class="btn btn-sm btn-danger deletepic" id="deletepic" value="Löschen" />
-            </form>
-        </div>
-    </fieldset>
-</div>
-
 <div id="result">
     <div class="card mx-auto mt-2 card-shadow">
         <img id="mypic" class="card-img-top" src="@Model.Url" alt="Card image cap">
@@ -27,47 +10,51 @@
             }
         </div>
     </div>
-</div>
 
-<div class="row mt-2">
-    <div class="card mx-auto card-shadow">
-        <div class="card-header h4 text-center">Category</div>
-        <div class="card-body row py-2">
-            @foreach (var category in Model.ImageAnalysis.Categories)
-            {
-                <div class="card col-auto m-1">
-                    <div class="card-header text-center">@category.Name</div>
-                    <div class="card-body">
-                        <div class="row">
-                            @if (category.Detail.Landmarks.Count() > 0)
-                            {
-                                <div class="col-auto">
-                                    <ul class="list-group">
-                                        <li class="list-group-item active">Landmarks</li>
-                                        @foreach (var landmarks in category.Detail.Landmarks)
-                                        {
-                                            <li class="list-group-item">@landmarks.Name</li>
-                                        }
-                                    </ul>
-                                </div>
-                            }
+    <div class="row mt-2">
+        <div class="card mx-auto card-shadow">
+            <div class="card-header h4 text-center">Category</div>
+            <div class="card-body row py-2">
+                @foreach (var category in Model.ImageAnalysis.Categories)
+                {
+                    if (category.Detail != null)
+                    {
+                        <div class="card col-auto m-1">
+                            <div class="card-header text-center">@category.Name</div>
+                            <div class="card-body">
+                                <div class="row">
 
-                            @if (category.Detail.Celebrities.Count() > 0)
-                            {
-                                <div class="col-auto">
-                                    <ul class="list-group">
-                                        <li class="list-group-item active">Celebrities</li>
-                                        @foreach (var celebrities in category.Detail.Celebrities)
-                                        {
-                                            <li class="list-group-item">@celebrities.Name</li>
-                                        }
-                                    </ul>
+                                    @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
+                                    {
+                                        <div class="col-auto">
+                                            <ul class="list-group">
+                                                <li class="list-group-item active">Landmarks</li>
+                                                @foreach (var landmarks in category.Detail.Landmarks)
+                                                {
+                                                    <li class="list-group-item">@landmarks.Name</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+
+                                    @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                    {
+                                        <div class="col-auto">
+                                            <ul class="list-group">
+                                                <li class="list-group-item active">Celebrities</li>
+                                                @foreach (var celebrities in category.Detail.Celebrities)
+                                                {
+                                                    <li class="list-group-item">@celebrities.Name</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
                                 </div>
-                            }
+                            </div>
                         </div>
-                    </div>
-                </div>
-            }
+                    }
+                }
+            </div>
         </div>
     </div>
 </div>

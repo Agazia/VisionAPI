@@ -32,9 +32,10 @@ namespace VisionAPI.Controllers
 
         public IActionResult Index()
         {
-            var model = _visioinAPIService
-                .AnalyzeImageAsync("https://agazia.net/assets/img/hero-bg.jpg",
-                 GetFeatureTypes()).Result;
+            var model = new ImageAnalysisVM();
+            var response = _visioinAPIService.AnalyzeImageAsync(model.Url, GetFeatureTypes()).Result;
+            model.ImageAnalysis = response;
+
             return View(model);
         }
 

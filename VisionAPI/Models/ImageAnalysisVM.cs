@@ -9,6 +9,6 @@ namespace VisionAPI.Models
     public class ImageAnalysisVM
     {
         public ImageAnalysis ImageAnalysis { get; set; }
-        public string Url { get; set; }
+        public string Url { get; set; } = new string("https://agazia.net/assets/img/hero-bg.jpg");
     }
 }

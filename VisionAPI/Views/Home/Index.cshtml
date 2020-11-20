@@ -1,11 +1,10 @@
-﻿@using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models
-@model ImageAnalysis
+﻿@model ImageAnalysisVM
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div id="res">
+<div id="uploadsection">
     <div class="alert alert-info text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert.</div>
     <fieldset class="border p-2">
         <legend class="w-auto">Bild analysieren</legend>
@@ -20,9 +19,11 @@
             </form>
         </div>
     </fieldset>
-    <partial name="_Hero" model="@Model" />
 </div>
 
+<div id="res">
+    <partial name="_Result" model="@Model" />
+</div>
 
 
 
