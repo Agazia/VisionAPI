@@ -32,5 +32,8 @@ namespace VisionAPI.Services
 
         public async Task<ImageAnalysis> AnalyzeImageInStreamAsync(Stream imageUrl, List<VisualFeatureTypes?> features)
             => await _client.AnalyzeImageInStreamAsync(imageUrl, features);
+
+        public async Task<ImageAnalysis> AnalyzeImageAsync(string url, List<VisualFeatureTypes?> features)
+            => await _client.AnalyzeImageAsync(url, features);
     }
 }

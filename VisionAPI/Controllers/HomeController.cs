@@ -32,7 +32,10 @@ namespace VisionAPI.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var model = _visioinAPIService
+                .AnalyzeImageAsync("https://agazia.net/assets/img/hero-bg.jpg",
+                 GetFeatureTypes()).Result;
+            return View(model);
         }
 
         [HttpPost]
@@ -44,6 +47,7 @@ namespace VisionAPI.Controllers
         [HttpPost]
         public IActionResult DeletePicture()
         {
+            var msg = "Nichts zu löschen!";
             var filename = "pic.png";
             var webPath = _hostingEnv.WebRootPath;
             var path = Path.Combine("", webPath + @"\img\" + filename);
@@ -51,25 +55,18 @@ namespace VisionAPI.Controllers
             if (System.IO.File.Exists(path))
             {
                 System.IO.File.Delete(path);
+                msg = "Das Bild wurde gelöscht!";
             }
-            return Json(true);
+            return Json(msg);
         }
 
         [HttpPost]
         public async Task<IActionResult> UploadLocal()
         {
+            var imageAnalysisVM = new ImageAnalysisVM();
+
             if (Request.Form.Files.Count > 0)
             {
-                var returnobj = "";
-
-                List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>()
-                {
-                    VisualFeatureTypes.Categories, VisualFeatureTypes.Description,
-                    VisualFeatureTypes.Faces, VisualFeatureTypes.ImageType,
-                    VisualFeatureTypes.Tags, VisualFeatureTypes.Adult,
-                    VisualFeatureTypes.Color, VisualFeatureTypes.Brands,
-                    VisualFeatureTypes.Objects
-                };
 
                 try
                 {
@@ -92,31 +89,28 @@ namespace VisionAPI.Controllers
                             using (var imageStream = new FileStream(path, FileMode.Open))
                             {
                                 ImageAnalysis res = _visioinAPIService
-                                    .AnalyzeImageInStreamAsync(imageStream, features).Result;
-
-                                var imageAnalysisVM = new ImageAnalysisVM()
-                                {
-                                    ImageAnalysis = res,
-                                    Url = url
-                                };
+                                    .AnalyzeImageInStreamAsync(imageStream, GetFeatureTypes()).Result;
+                                imageAnalysisVM.ImageAnalysis = res;
+                                imageAnalysisVM.Url = url;
                                 return Json(imageAnalysisVM);
                             }
                         }
                         else
                         {
-                            returnobj = "Filetype not supported. Please make sure to choose an image (.jpeg, .png, .gif) less than 5MB and try again!";
+                            imageAnalysisVM.Url = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than 5MB and try again!";
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Json("Error occurered. Error details: " + ex.Message);
+                    imageAnalysisVM.Url = ex.ToString();
                 }
-                return Json(returnobj);
+                return Json(imageAnalysisVM);
             }
             else
             {
-                return Json("No files selected.");
+                imageAnalysisVM.Url = "Picture not found!";
+                return Json(imageAnalysisVM);
             }
         }
 
@@ -128,10 +122,11 @@ namespace VisionAPI.Controllers
         public bool IsValidImg(IFormFile file)
         {
             var types = new[] { "image/png", "image/jpeg", "image/gif" };
+            var megaByteSize = ConvertBytesToMegabytes(file.Length);
 
             foreach (var type in types)
             {
-                if (type == file.ContentType & ConvertBytesToMegabytes(file.Length) < 6)
+                if (type == file.ContentType & megaByteSize <= 5)
                     return true;
             }
 
@@ -141,6 +136,16 @@ namespace VisionAPI.Controllers
         {
             return (bytes / 1024f) / 1024f;
         }
+
+        public List<VisualFeatureTypes?> GetFeatureTypes()
+            => new List<VisualFeatureTypes?>()
+            {
+                VisualFeatureTypes.Categories, VisualFeatureTypes.Description,
+                VisualFeatureTypes.Faces, VisualFeatureTypes.ImageType,
+                VisualFeatureTypes.Tags, VisualFeatureTypes.Adult,
+                VisualFeatureTypes.Color, VisualFeatureTypes.Brands,
+                VisualFeatureTypes.Objects
+            };
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

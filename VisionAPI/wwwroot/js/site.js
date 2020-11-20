@@ -5,7 +5,7 @@
 
 // Upload Profile Picture (Portrait)
 
-$('#uploadpic').click(function () {
+$(document).on('click', '.uploadpic', function () {
     $('#loadingModal').modal('show')
     $('#modal-content').html('<div class="spinner-border" role="status">\n</div >\n<h4>Das Bild wird analysiert</h4>\n<p>Bitte um etwas Geduld!</p>');
     if (window.FormData !== undefined) {
@@ -28,29 +28,42 @@ $('#uploadpic').click(function () {
                 processData: false,
                 data: data,
                 success: function (message) {
-                    $('#res').load("/Home/LoadResult", message);
-                    $('#modal-content').html('<p class="font-weight-bold text-success"><i class="fas fa-check-circle"></i>Picture uploaded successfully</p><button id="uploaded" type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
-                    $('#inputpic').val("");
+                    if (message.url.includes('pic.png')) {
+                        $('#res').load("/Home/LoadResult", message);
+                        $('#modal-content').html('<p class="font-weight-bold text-success"><i class="fas fa-check-circle"></i> Das Bild wurde analysiert!</p><button id="uploaded" type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+                        $('#inputpic').val("");
+                    }
+                    else {
+                        $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> ' + message.url + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+                    }
                 },
                 error: function () {
                     $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> There was error uploaing files! Please try again</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
                 }
             }).done();
-        }        
+        }
     } else {
         $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> An error occured while processing the file!</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
     }
-
 });
 
-$('#deletepic').click(function () {
+$(document).on('click', '.deletepic', function () {
+
+    $('#loadingModal').modal('show')
+    $('#modal-content').html('<div class="spinner-border" role="status">\n</div >\n<h4>Das Bild wird gelöscht</h4>\n<p>Bitte um etwas Geduld!</p>');
+
     $.ajax({
         url: "/Home/DeletePicture",
         type: "POST",
         contentType: false,
         processData: false,
         success: function (message) {
-            $('#result').html('<h4 class="mt-3 text-center">Deleted</h4>');
+            if (message.includes('Nichts')) {
+                $('#modal-content').html('<p class="font-weight-bold"><i class="fas fa-info"></i> ' + message + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+            } else {
+                $('#result').remove();
+                $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> ' + message + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+            }
         },
         error: function () {
             alert("Error deleting the picture!");
