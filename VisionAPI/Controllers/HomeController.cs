@@ -12,6 +12,7 @@ using VisionAPI.Services;
 using System.IO;
 using System.Collections;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
 namespace VisionAPI.Controllers
 {
@@ -19,11 +20,11 @@ namespace VisionAPI.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly MSVisionAPIService _visioinAPIService;
-        private readonly IHostingEnvironment _hostingEnv;
+        private readonly IWebHostEnvironment _hostingEnv;
 
         public HomeController(ILogger<HomeController> logger
             ,MSVisionAPIService visionAPIService
-            ,IHostingEnvironment hostingEnv)
+            ,IWebHostEnvironment hostingEnv)
         {
             _logger = logger;
             _visioinAPIService = visionAPIService;
@@ -35,6 +36,7 @@ namespace VisionAPI.Controllers
             var model = new ImageAnalysisVM();
             var response = _visioinAPIService.AnalyzeImageAsync(model.Url, GetFeatureTypes()).Result;
             model.ImageAnalysis = response;
+            model.Filename = Guid.NewGuid().ToString();
 
             return View(model);
         }
@@ -46,20 +48,10 @@ namespace VisionAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeletePicture()
-        {
-            var msg = "Nichts zu löschen!";
-            var filename = "pic.png";
-            var webPath = _hostingEnv.WebRootPath;
-            var path = Path.Combine("", webPath + @"\img\" + filename);
-
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-                msg = "Das Bild wurde gelöscht!";
-            }
-            return Json(msg);
-        }
+        public IActionResult DeletePicture(string Id)
+            => Json(DeletePicById(Id) 
+                ? "Das Bild wurde gelöscht!" 
+                : "Nichts zu löschen!");
 
         [HttpPost]
         public async Task<IActionResult> UploadLocal()
@@ -78,10 +70,10 @@ namespace VisionAPI.Controllers
                         if (IsValidImg(file))
                         {
                             //Upload Local
-                            var filename = "pic.png";
+                            var filename = Guid.NewGuid().ToString();
                             var webPath = _hostingEnv.WebRootPath;
-                            var path = Path.Combine("", webPath + @"\img\" + filename);
-                            var url = string.Format("{0}://{1}/img/{2}", Request.Scheme, Request.Host, filename);
+                            var path = Path.Combine("", webPath + @"\img\" + filename + ".png");
+                            var url = $"{Request.Scheme}://{Request.Host}/img/{filename}.png";
                             using (var stream = new FileStream(path, FileMode.Create))
                             {
                                 await file.CopyToAsync(stream);
@@ -93,6 +85,7 @@ namespace VisionAPI.Controllers
                                     .AnalyzeImageInStreamAsync(imageStream, GetFeatureTypes()).Result;
                                 imageAnalysisVM.ImageAnalysis = res;
                                 imageAnalysisVM.Url = url;
+                                imageAnalysisVM.Filename = filename;
                                 return Json(imageAnalysisVM);
                             }
                         }
@@ -118,6 +111,37 @@ namespace VisionAPI.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public bool DeleteFilesInFolder()
+        {
+            var webPath = _hostingEnv.WebRootPath;
+            var path = Path.Combine("", webPath + @"\img\");
+
+            if (Directory.GetFiles(path).Length > 0)
+            {
+                DirectoryInfo di = new DirectoryInfo(path);
+                foreach (var file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool DeletePicById(string Id)
+        {
+            var webPath = _hostingEnv.WebRootPath;
+            var path = Path.Combine("", webPath + @"\img\" + Id + ".png");
+
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+                return true;
+            }
+            return false;
         }
 
         public bool IsValidImg(IFormFile file)

@@ -28,7 +28,7 @@ $(document).on('click', '.uploadpic', function () {
                 processData: false,
                 data: data,
                 success: function (message) {
-                    if (message.url.includes('pic.png')) {
+                    if (message.url.includes('.png')) {
                         $('#res').load("/Home/LoadResult", message);
                         $('#modal-content').html('<p class="font-weight-bold text-success"><i class="fas fa-check-circle"></i> Das Bild wurde analysiert!</p><button id="uploaded" type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
                         $('#inputpic').val("");
@@ -52,21 +52,24 @@ $(document).on('click', '.deletepic', function () {
     $('#loadingModal').modal('show')
     $('#modal-content').html('<div class="spinner-border" role="status">\n</div >\n<h4>Das Bild wird gelöscht</h4>\n<p>Bitte um etwas Geduld!</p>');
 
-    $.ajax({
-        url: "/Home/DeletePicture",
-        type: "POST",
-        contentType: false,
-        processData: false,
-        success: function (message) {
-            if (message.includes('Nichts')) {
-                $('#modal-content').html('<p class="font-weight-bold"><i class="fas fa-info"></i> ' + message + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
-            } else {
-                $('#result').remove();
-                $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> ' + message + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
-            }
+    var imgId = $('.imageai').attr('id');
+
+    $.post('Home/DeletePicture',
+        {
+            id: imgId
         },
-        error: function () {
-            alert("Error deleting the picture!");
-        }
-    })
+        function (data, status) {
+            if (status == 'success') {
+                if (data.includes('Nichts')) {
+                    $('#modal-content').html('<p class="font-weight-bold"><i class="fas fa-info"></i> ' + data + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+                } else {
+                    $('#result').remove();
+                    $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> ' + data + '</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+                }
+            } else {
+                $('#modal-content').html('<p class="font-weight-bold text-danger"><i class="fas fa-info"></i> An error occured while deleting the file!</p><button type="button" class="btn btn-sm btn-primary" style="width: 8rem;" data-dismiss="modal">Ok</button>');
+            }
+        });
 });
+
+

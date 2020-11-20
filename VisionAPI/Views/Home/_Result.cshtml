@@ -1,14 +1,20 @@
 ﻿@model ImageAnalysisVM
 
 <div id="result">
+    <div class="alert my-1 alert-warning alert-dismissible fade show" role="alert">
+        <small>Bitte vergessen Sie nicht, Ihr Bild nach der Analyse zu löschen, indem Sie auf die Schaltfläche "Löschen" klicken!</small>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <div class="card mx-auto mt-2 card-shadow">
-        <img id="mypic" class="card-img-top" src="@Model.Url" alt="Card image cap">
         <div class="card-body text-center">
             @foreach (var caption in @Model.ImageAnalysis.Description.Captions)
             {
                 <p class="card-text">@caption.Text</p>
             }
         </div>
+        <img id="@Model.Filename" class="card-img-bottom imageai" src="@Model.Url" alt="Card image cap">
     </div>
 
     <div class="row mt-2">
