@@ -1,66 +1,80 @@
 ﻿@model ImageAnalysisVM
 
 <div id="result">
-    <div class="alert my-1 alert-warning alert-dismissible fade show" role="alert">
+
+    <!-- #region Analyse Result -->
+    <div class="row mt-2">
+
+        @*Category Start*@
+        <div class="col-auto mx-auto">
+            <div class="card mx-auto alert-primary card-shadow">
+                <div class="card-header h4 text-center">Category</div>
+                <div class="card-body row py-2">
+                    @foreach (var category in Model.ImageAnalysis.Categories)
+                    {
+                        if (category.Detail != null)
+                        {
+                            <div class="card col-auto mx-auto m-1">
+                                <div class="card-header text-center">@category.Name</div>
+                                <div class="card-body">
+                                    <div class="row">
+
+                                        @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
+                                        {
+                                            <div class="col-auto mx-auto">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item active">Landmarks</li>
+                                                    @foreach (var landmarks in category.Detail.Landmarks)
+                                                    {
+                                                        <li class="list-group-item">@landmarks.Name</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+
+                                        @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                        {
+                                            <div class="col-auto mx-auto">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item active">Celebrities</li>
+                                                    @foreach (var celebrities in category.Detail.Celebrities)
+                                                    {
+                                                        <li class="list-group-item">@celebrities.Name</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        @*Category End*@
+
+    </div>
+    <!-- #endregion -->
+
+    @*Information*@
+    <div class="alert my-2 alert-warning alert-dismissible fade show" role="alert">
         <small>Bitte vergessen Sie nicht, Ihr Bild nach der Analyse zu löschen, indem Sie auf die Schaltfläche "Löschen" klicken!</small>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="card mx-auto mt-2 card-shadow">
-        <div class="card-body text-center">
+
+    <!-- #region Picture -->
+    <div class="card mx-auto mt-2">
+        <div id="description" class="card-body card-shadow alert-primary text-center">
             @foreach (var caption in @Model.ImageAnalysis.Description.Captions)
             {
-                <p class="card-text">@caption.Text</p>
+                <h5 class="card-text">@caption.Text.First().ToString().ToUpper() @caption.Text.Substring(1)</h5>
             }
         </div>
-        <img id="@Model.Filename" class="card-img-bottom imageai" src="@Model.Url" alt="Card image cap">
+        <img id="@Model.Filename" class="card-img-bottom card-shadow alert-primary imageai" src="@Model.Url" alt="Card image cap">
     </div>
+    <!-- #endregion-->
 
-    <div class="row mt-2">
-        <div class="card mx-auto card-shadow">
-            <div class="card-header h4 text-center">Category</div>
-            <div class="card-body row py-2">
-                @foreach (var category in Model.ImageAnalysis.Categories)
-                {
-                    if (category.Detail != null)
-                    {
-                        <div class="card col-auto m-1">
-                            <div class="card-header text-center">@category.Name</div>
-                            <div class="card-body">
-                                <div class="row">
-
-                                    @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
-                                    {
-                                        <div class="col-auto">
-                                            <ul class="list-group">
-                                                <li class="list-group-item active">Landmarks</li>
-                                                @foreach (var landmarks in category.Detail.Landmarks)
-                                                {
-                                                    <li class="list-group-item">@landmarks.Name</li>
-                                                }
-                                            </ul>
-                                        </div>
-                                    }
-
-                                    @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
-                                    {
-                                        <div class="col-auto">
-                                            <ul class="list-group">
-                                                <li class="list-group-item active">Celebrities</li>
-                                                @foreach (var celebrities in category.Detail.Celebrities)
-                                                {
-                                                    <li class="list-group-item">@celebrities.Name</li>
-                                                }
-                                            </ul>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-            </div>
-        </div>
-    </div>
 </div>
