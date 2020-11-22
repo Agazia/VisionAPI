@@ -10,12 +10,34 @@
         <legend class="w-auto">Bild analysieren</legend>
         <div class="px-3 mt-2">
             <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <input class="card p-2" id="inputpic" type="file" accept="image/*" />
-                    <small>Unterstützte Bilddatei: "jpeg, png, gif", maximale Dateigröße: 5MB</small>
+                <div class="row mx-auto mb-2">
+                    <div class="col-auto col-md-6 mx-auto">
+                        <fieldset class="card-shadow border p-2">
+                            <legend class="w-auto">Bild hochlagen</legend>
+                            <div class="px-3 mt-2">
+                                <div class="form-group">
+                                    <input class="card p-2 w-100" id="inputpic" type="file" accept="image/*" />
+                                    <small>Unterstützte Bilddatei: "jpeg, png, gif", maximale Dateigröße: 5MB</small>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-auto col-md-6 mx-auto">
+                        <fieldset class="card-shadow border p-2">
+                            <legend class="w-auto">Url eingeben</legend>
+                            <div class="px-3 mt-2">
+                                <div class="form-group">
+                                    <input asp-for="Url" class="card p-2 w-100" id="inputurl" type="text" />
+                                    <small>Bild-URL hier eingeben!</small>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
-                <input type="button" class="btn btn-sm btn-primary uploadpic" id="uploadpic" value="Hochladen" />
-                <input type="button" class="btn btn-sm btn-danger deletepic" id="deletepic" value="Löschen" />
+                <div class="text-center">
+                    <input type="button" class="btn btn-primary uploadpic" id="uploadpic" value="Bild analysieren" />
+                    <input type="button" class="btn btn-danger deletepic" id="deletepic" value="Bild löschen" />
+                </div>
             </form>
         </div>
     </fieldset>

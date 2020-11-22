@@ -34,10 +34,18 @@ namespace VisionAPI.Controllers
         public IActionResult Index()
         {
             var model = new ImageAnalysisVM();
-            var response = _visioinAPIService.AnalyzeImageAsync(model.Url, GetFeatureTypes()).Result;
-            model.ImageAnalysis = response;
-            model.Filename = Guid.NewGuid().ToString();
-
+            try
+            {
+                var response = _visioinAPIService.AnalyzeImageAsync(model.Url, GetFeatureTypes()).Result;
+                model.ImageAnalysis = response;
+                model.Filename = Guid.NewGuid().ToString();
+                model.Message = "Success";
+            }
+            catch (Exception e)
+            {
+                model.Message = $"Error: {e}";
+                throw;
+            }
             return View(model);
         }
 
@@ -49,9 +57,7 @@ namespace VisionAPI.Controllers
 
         [HttpPost]
         public IActionResult DeletePicture(string Id)
-            => Json(DeletePicById(Id) 
-                ? "Das Bild wurde gelöscht!" 
-                : "Nichts zu löschen!");
+            => Json(DeletePicById(Id));
 
         [HttpPost]
         public async Task<IActionResult> UploadLocal()
@@ -60,7 +66,6 @@ namespace VisionAPI.Controllers
 
             if (Request.Form.Files.Count > 0)
             {
-
                 try
                 {
                     var files = Request.Form.Files;
@@ -86,24 +91,39 @@ namespace VisionAPI.Controllers
                                 imageAnalysisVM.ImageAnalysis = res;
                                 imageAnalysisVM.Url = url;
                                 imageAnalysisVM.Filename = filename;
+                                imageAnalysisVM.Message = "Success";
                                 return Json(imageAnalysisVM);
                             }
                         }
                         else
                         {
-                            imageAnalysisVM.Url = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than 5MB and try again!";
+                            imageAnalysisVM.Message = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than 5MB and try again!";
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    imageAnalysisVM.Url = ex.ToString();
+                    imageAnalysisVM.Message = $"Error: {ex}";
                 }
                 return Json(imageAnalysisVM);
             }
             else
             {
-                imageAnalysisVM.Url = "Picture not found!";
+                try
+                {
+                    var picUrl = Request.Form.FirstOrDefault(x => x.Key == "picurl").Value;
+                    var response = _visioinAPIService.AnalyzeImageAsync(picUrl, GetFeatureTypes()).Result;
+                    imageAnalysisVM.ImageAnalysis = response;
+                    imageAnalysisVM.Url = picUrl;
+                    imageAnalysisVM.Filename = Guid.NewGuid().ToString();
+                    imageAnalysisVM.Message = "Success";
+
+                    return Json(imageAnalysisVM);
+                }
+                catch (Exception e)
+                {
+                    imageAnalysisVM.Message = $"Error: The given URL is not valid!";
+                }
                 return Json(imageAnalysisVM);
             }
         }
