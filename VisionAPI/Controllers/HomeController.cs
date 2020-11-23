@@ -41,9 +41,9 @@ namespace VisionAPI.Controllers
                 model.Filename = Guid.NewGuid().ToString();
                 model.Message = "Success";
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                model.Message = $"Error: {e}";
+                model.Message = $"Error: An error occured while analyzing the image";
                 throw;
             }
             return View(model);
@@ -101,9 +101,9 @@ namespace VisionAPI.Controllers
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    imageAnalysisVM.Message = $"Error: {ex}";
+                    imageAnalysisVM.Message = $"Error: An error occured while analyzing the image.";
                 }
                 return Json(imageAnalysisVM);
             }
@@ -120,7 +120,7 @@ namespace VisionAPI.Controllers
 
                     return Json(imageAnalysisVM);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     imageAnalysisVM.Message = $"Error: The given URL is not valid!";
                 }

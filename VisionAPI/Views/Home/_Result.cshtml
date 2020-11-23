@@ -6,59 +6,58 @@
     <div class="row mt-2 mx-auto">
         @if (Model.ImageAnalysis.Categories != null && Model.ImageAnalysis.Categories.Count() > 0)
         {
-
-        }
-        @*Category Start*@
-        <div class="col-auto px-0 my-1 mx-auto">
-            <div class="card mx-auto alert-primary card-shadow">
-                <div class="card-header h4 text-center">Category <span class="badge badge-primary">@Model.ImageAnalysis.Categories.Count()</span></div>
-                <div class="card-body row py-2">
-                    @foreach (var category in Model.ImageAnalysis.Categories)
-                    {
-                        if (category.Detail != null)
+            @*Category Start*@
+            <div class="col-auto px-0 my-1 mx-auto">
+                <div class="card mx-auto alert-primary card-shadow">
+                    <div class="card-header h4 text-center">Category <span class="badge badge-primary">@Model.ImageAnalysis.Categories.Count()</span></div>
+                    <div class="card-body row py-2">
+                        @foreach (var category in Model.ImageAnalysis.Categories)
                         {
-                            <div class="card card-shadow col-auto px-0 mx-auto">
-                                <div class="card-header text-center">@category.Name</div>
-                                @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0
-                                  || category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
-                                {
-                                    <div class="card-body">
-                                        <div class="row">
-                                            @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
-                                            {
+                            if (category.Detail != null)
+                            {
+                                <div class="card card-shadow col-auto px-0 mx-auto">
+                                    <div class="card-header text-center">@category.Name</div>
+                                    @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0
+                                      || category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                    {
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
+                                                {
 
-                                                <div class="col-auto px-0 mx-1">
-                                                    <ul class="list-group card-shadow">
-                                                        <li class="list-group-item active">Landmarks</li>
-                                                        @foreach (var landmarks in category.Detail.Landmarks)
-                                                        {
-                                                            <li class="list-group-item">@landmarks.Name</li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            }
+                                                    <div class="col-auto px-0 mx-1">
+                                                        <ul class="list-group card-shadow">
+                                                            <li class="list-group-item active">Landmarks</li>
+                                                            @foreach (var landmarks in category.Detail.Landmarks)
+                                                            {
+                                                                <li class="list-group-item">@landmarks.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
 
-                                            @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
-                                            {
-                                                <div class="col-auto px-0 mx-1">
-                                                    <ul class="list-group card-shadow">
-                                                        <li class="list-group-item active">Celebrities</li>
-                                                        @foreach (var celebrities in category.Detail.Celebrities)
-                                                        {
-                                                            <li class="list-group-item">@celebrities.Name</li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            }
+                                                @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                                {
+                                                    <div class="col-auto px-0 mx-1">
+                                                        <ul class="list-group card-shadow">
+                                                            <li class="list-group-item active">Celebrities</li>
+                                                            @foreach (var celebrities in category.Detail.Celebrities)
+                                                            {
+                                                                <li class="list-group-item">@celebrities.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                            </div>
+                                    }
+                                </div>
+                            }
                         }
-                    }
+                    </div>
                 </div>
             </div>
-        </div>
+        }
         @*Category End*@
 
         @*Tags Start*@
