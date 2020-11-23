@@ -97,7 +97,7 @@ namespace VisionAPI.Controllers
                         }
                         else
                         {
-                            imageAnalysisVM.Message = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than 5MB and try again!";
+                            imageAnalysisVM.Message = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than or equal to 4 MB and try again!";
                         }
                     }
                 }
@@ -171,7 +171,7 @@ namespace VisionAPI.Controllers
 
             foreach (var type in types)
             {
-                if (type == file.ContentType & megaByteSize <= 5)
+                if (type == file.ContentType & megaByteSize <= 4)
                     return true;
             }
 

@@ -7,15 +7,15 @@
 
 
 $(document).on('click', '.uploadpic', function () {
-    $('#loadingModal').modal('show')
+    $('#loadingModal').modal('show');
     $('#modal-content').html(returnLoadingMsg('Das Bild wird analysiert'));
 
     var picurl = $("#inputurl").val();
     var picUpload = $('#inputpic').get(0);
+    var data = new FormData();
 
-    if (picUpload.files.length != 0) {
+    if (picUpload.files.length !== 0) {
         var pic = picUpload.files;
-        var data = new FormData();
 
         for (var i = 0; i < pic.length; i++) {
             data.append(pic[i].name, pic[i]);
@@ -25,9 +25,8 @@ $(document).on('click', '.uploadpic', function () {
 
         Example(data);
         
-    } else if (picurl != "")
+    } else if (picurl !== "")
     {
-        var data = new FormData();
         data.append('picurl', picurl);
         Example(data);
     } else {
@@ -66,7 +65,7 @@ function Example(data) {
 
 $(document).on('click', '.deletepic', function () {
 
-    $('#loadingModal').modal('show')
+    $('#loadingModal').modal('show');
     $('#modal-content').html(returnLoadingMsg('Das Bild wird gelöscht'));
 
     var imgId = $('.imageai').attr('id');
