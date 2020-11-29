@@ -1,11 +1,11 @@
-﻿@model ImageAnalysisVM
+﻿@model CognetiveContainer
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <div id="uploadsection">
-    <div class="alert h5 alert-info shadow-sm text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert.</div>
+    <div class="alert h6 alert-info shadow-sm text-center">Ein KI-Dienst, der Inhalte in Bildern analysiert und die Texte in Sprache umwandelt</div>
     <fieldset class="card-shadow border p-2">
         <legend class="w-auto">Bild analysieren</legend>
         <div class="px-3 mt-2">
@@ -27,7 +27,7 @@
                             <legend class="w-auto">Url eingeben</legend>
                             <div class="px-3 mt-2">
                                 <div class="form-group">
-                                    <input asp-for="Url" class="card p-2 w-100" id="inputurl" type="text" />
+                                    <input asp-for="ImageAnalysisVM.Url" class="card p-2 w-100" id="inputurl" type="text" />
                                     <small>Bild-URL hier eingeben!</small>
                                 </div>
                             </div>
@@ -35,16 +35,16 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <input type="button" class="btn btn-primary uploadpic" id="uploadpic" value="Bild analysieren" />
-                    <input type="button" class="btn btn-danger deletepic" id="deletepic" value="Bild löschen" />
+                    <a class="btn btn-outline-primary" href="javascript:analyze_imgAndSpeech();">Bild analysieren</a>
+                    @*<a class="btn btn-outline-danger" href="javascript:delete_img('@Model.ImageAnalysisVM.Url');" id="deletepic">Löschen</a>*@
                 </div>
             </form>
         </div>
     </fieldset>
 </div>
 
-<div id="res">
-    <partial name="_Result" model="@Model" />
+<div id="resultsection" class="analyse">
+
 </div>
 
 

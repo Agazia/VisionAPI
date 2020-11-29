@@ -13,6 +13,7 @@ using System.IO;
 using System.Collections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 namespace VisionAPI.Controllers
 {
@@ -21,134 +22,134 @@ namespace VisionAPI.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MSVisionAPIService _visioinAPIService;
         private readonly IWebHostEnvironment _hostingEnv;
+        private readonly ITextToSpeech _textToSpeech;
 
         public HomeController(ILogger<HomeController> logger
             ,MSVisionAPIService visionAPIService
-            ,IWebHostEnvironment hostingEnv)
+            ,IWebHostEnvironment hostingEnv
+            ,ITextToSpeech textToSpeech
+            )
         {
             _logger = logger;
             _visioinAPIService = visionAPIService;
             _hostingEnv = hostingEnv;
+            _textToSpeech = textToSpeech;
         }
 
         public IActionResult Index()
         {
-            var model = new ImageAnalysisVM();
-            try
+            return View(new CognetiveContainer()
             {
-                var response = _visioinAPIService.AnalyzeImageAsync(model.Url, GetFeatureTypes()).Result;
-                model.ImageAnalysis = response;
-                model.Filename = Guid.NewGuid().ToString();
-                model.Message = "Success";
-            }
-            catch (Exception)
-            {
-                model.Message = $"Error: An error occured while analyzing the image";
-                throw;
-            }
-            return View(model);
+                ImageAnalysisVM = new ImageAnalysisVM() { Url = "https://agazia.net/assets/img/hero-bg.jpg" }
+            });
         }
 
         [HttpPost]
-        public IActionResult LoadResult(ImageAnalysisVM model)
-        {
-            return PartialView("_Result", model);
-        }
+        public IActionResult TextToSpeech(SpeechAnalyseVM model)
+            => PartialView("_Speech", model);
+
+        [HttpPost]
+        public IActionResult PlaySpeech(SpeechAnalyseVM model)
+            => PartialView("_PlaySpeech", model);
+
+        [HttpPost]
+        public async Task<IActionResult> UploadSpeech(string Id)
+            => Json(await _textToSpeech.AnalyseSpeechAsync(Id, $"{Request.Scheme}://{Request.Host}/"));
+        
+
+        [HttpPost]
+        public IActionResult LoadResult(CognetiveContainer model)
+            => PartialView("_Result", model);
 
         [HttpPost]
         public IActionResult DeletePicture(string Id)
             => Json(DeletePicById(Id));
 
         [HttpPost]
-        public async Task<IActionResult> UploadLocal()
+        public async Task<IActionResult> AnalyzeImage()
+            => Json(await _visioinAPIService.AnalyzeImageFileOrUrlAsync(Request.Form, $"{Request.Scheme}://{Request.Host}/"));
+
+        [HttpPost]
+        public async Task<IActionResult> AnalyzeImageAndSound()
         {
-            var imageAnalysisVM = new ImageAnalysisVM();
+            var cognitiveContainer = new CognetiveContainer();
 
-            if (Request.Form.Files.Count > 0)
+            try
             {
-                try
+                cognitiveContainer.ImageAnalysisVM = await _visioinAPIService.AnalyzeImageFileOrUrlAsync(Request.Form, $"{Request.Scheme}://{Request.Host}/");
+                if (cognitiveContainer.ImageAnalysisVM.Message == "Success")
                 {
-                    var files = Request.Form.Files;
-
-                    foreach (var file in files)
+                    var content = cognitiveContainer.ImageAnalysisVM.ImageAnalysis.Description.Captions.FirstOrDefault().Text;
+                    cognitiveContainer.SpeechAnalyseVM = await _textToSpeech.AnalyseSpeechAsync(content, $"{Request.Scheme}://{Request.Host}/");
+                    if (cognitiveContainer.SpeechAnalyseVM.Message == "Success")
                     {
-                        if (IsValidImg(file))
-                        {
-                            //Upload Local
-                            var filename = Guid.NewGuid().ToString();
-                            var webPath = _hostingEnv.WebRootPath;
-                            var path = Path.Combine("", webPath + @"\img\" + filename + ".png");
-                            var url = $"{Request.Scheme}://{Request.Host}/img/{filename}.png";
-                            using (var stream = new FileStream(path, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-
-                            using (var imageStream = new FileStream(path, FileMode.Open))
-                            {
-                                ImageAnalysis res = _visioinAPIService
-                                    .AnalyzeImageInStreamAsync(imageStream, GetFeatureTypes()).Result;
-                                imageAnalysisVM.ImageAnalysis = res;
-                                imageAnalysisVM.Url = url;
-                                imageAnalysisVM.Filename = filename;
-                                imageAnalysisVM.Message = "Success";
-                                return Json(imageAnalysisVM);
-                            }
-                        }
-                        else
-                        {
-                            imageAnalysisVM.Message = "Error: Please make sure to choose an image (.jpeg, .png, .gif) less than or equal to 4 MB and try again!";
-                        }
+                        cognitiveContainer.Message = "Success";
+                    }
+                    else
+                    {
+                        cognitiveContainer.Message = cognitiveContainer.SpeechAnalyseVM.Message;
                     }
                 }
-                catch (Exception)
+                else
                 {
-                    imageAnalysisVM.Message = $"Error: An error occured while analyzing the image.";
+                    cognitiveContainer.Message = cognitiveContainer.ImageAnalysisVM.Message;
                 }
-                return Json(imageAnalysisVM);
             }
-            else
+            catch (Exception ex)
             {
-                try
-                {
-                    var picUrl = Request.Form.FirstOrDefault(x => x.Key == "picurl").Value;
-                    var response = _visioinAPIService.AnalyzeImageAsync(picUrl, GetFeatureTypes()).Result;
-                    imageAnalysisVM.ImageAnalysis = response;
-                    imageAnalysisVM.Url = picUrl;
-                    imageAnalysisVM.Filename = Guid.NewGuid().ToString();
-                    imageAnalysisVM.Message = "Success";
-
-                    return Json(imageAnalysisVM);
-                }
-                catch (Exception)
-                {
-                    imageAnalysisVM.Message = $"Error: The given URL is not valid!";
-                }
-                return Json(imageAnalysisVM);
+                cognitiveContainer.Message = $"Error: {ex}";
             }
+            
+            return Json(cognitiveContainer);
         }
+
 
         public IActionResult Privacy()
         {
             return View();
         }
 
-        public bool DeleteFilesInFolder()
+        [HttpPost]
+        public IActionResult DeleteAll()
+            => Json(DeleteImgAndSound());
+
+        public bool DeleteFilesInFolder(string path)
         {
-            var webPath = _hostingEnv.WebRootPath;
-            var path = Path.Combine("", webPath + @"\img\");
 
             if (Directory.GetFiles(path).Length > 0)
             {
                 DirectoryInfo di = new DirectoryInfo(path);
                 foreach (var file in di.GetFiles())
                 {
-                    file.Delete();
+                    try
+                    {
+                        var formatstring = "yyyyMMddHHmmss";
+                        var filedate = DateTime.ParseExact(file.Name.Split('_').First(), formatstring, CultureInfo.InvariantCulture);
+                        if (filedate < DateTime.Now.AddDays(-7))
+                        {
+                            file.Delete();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.ToString();
+                        return false;
+                    }
                 }
                 return true;
             }
 
             return false;
+        }
+
+        public bool DeleteImgAndSound()
+        {
+            var webPath = _hostingEnv.WebRootPath;
+            var path = Path.Combine("", webPath + @"\sound\");
+            DeleteFilesInFolder(path);
+            path = Path.Combine("", webPath + @"\img\");
+            DeleteFilesInFolder(path);
+            return true;
         }
 
         public bool DeletePicById(string Id)
@@ -163,34 +164,6 @@ namespace VisionAPI.Controllers
             }
             return false;
         }
-
-        public bool IsValidImg(IFormFile file)
-        {
-            var types = new[] { "image/png", "image/jpeg", "image/gif" };
-            var megaByteSize = ConvertBytesToMegabytes(file.Length);
-
-            foreach (var type in types)
-            {
-                if (type == file.ContentType & megaByteSize <= 4)
-                    return true;
-            }
-
-            return false;
-        }
-        static double ConvertBytesToMegabytes(long bytes)
-        {
-            return (bytes / 1024f) / 1024f;
-        }
-
-        public List<VisualFeatureTypes?> GetFeatureTypes()
-            => new List<VisualFeatureTypes?>()
-            {
-                VisualFeatureTypes.Categories, VisualFeatureTypes.Description,
-                VisualFeatureTypes.Faces, VisualFeatureTypes.ImageType,
-                VisualFeatureTypes.Tags, VisualFeatureTypes.Adult,
-                VisualFeatureTypes.Color, VisualFeatureTypes.Brands,
-                VisualFeatureTypes.Objects
-            };
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

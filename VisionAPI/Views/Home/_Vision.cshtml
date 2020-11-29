@@ -1,0 +1,141 @@
+﻿@model ImageAnalysisVM
+
+<div id="visionsection"> @*result*@
+
+    <!-- #region Picture -->
+    <div class="card mx-auto mt-2">
+        <div id="description" class="card-body card-shadow alert-primary text-center">
+            @foreach (var caption in @Model.ImageAnalysis.Description.Captions)
+            {
+                <h5 id="imgdesc" class="card-text">@caption.Text.First().ToString().ToUpper()@caption.Text.Substring(1)</h5>
+            }
+        </div>
+        <img id="@Model.Filename" class="card-img-bottom card-shadow alert-primary imageai" src="@Model.Url" alt="Card image cap">
+    </div>
+    <!-- #endregion-->
+    <!-- #region Analyse Result -->
+    <div class="row mt-2 mx-auto">
+        @if (Model.ImageAnalysis.Categories != null && Model.ImageAnalysis.Categories.Count() > 0)
+        {
+            @*Category Start*@
+            <div class="col-auto px-0 my-1 mx-auto">
+                <div class="card mx-auto alert-primary card-shadow">
+                    <div class="card-header h4 text-center">Category <span class="badge badge-primary">@Model.ImageAnalysis.Categories.Count()</span></div>
+                    <div class="card-body row py-2">
+                        @foreach (var category in Model.ImageAnalysis.Categories)
+                        {
+                            if (category.Detail != null)
+                            {
+                                <div class="card card-shadow col-auto px-0 mx-auto">
+                                    <div class="card-header text-center">@category.Name</div>
+                                    @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0
+                                    || category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                    {
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @if (category.Detail.Landmarks != null && category.Detail.Landmarks.Count() > 0)
+                                                {
+
+                                                    <div class="col-auto px-0 mx-1">
+                                                        <ul class="list-group card-shadow">
+                                                            <li class="list-group-item active">Landmarks</li>
+                                                            @foreach (var landmarks in category.Detail.Landmarks)
+                                                            {
+                                                                <li class="list-group-item">@landmarks.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+
+                                                @if (category.Detail.Celebrities != null && category.Detail.Celebrities.Count() > 0)
+                                                {
+                                                    <div class="col-auto px-0 mx-1">
+                                                        <ul class="list-group card-shadow">
+                                                            <li class="list-group-item active">Celebrities</li>
+                                                            @foreach (var celebrities in category.Detail.Celebrities)
+                                                            {
+                                                                <li class="list-group-item">@celebrities.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @*Category End*@
+
+        @*Tags Start*@
+        @if (Model.ImageAnalysis.Tags != null && Model.ImageAnalysis.Tags.Count() > 0)
+        {
+            <div class="col-auto px-0 mx-auto my-1">
+                <div class="card mx-auto alert-primary card-shadow">
+                    <div class="card-header h4 text-center">Tags <span class="badge badge-primary">@Model.ImageAnalysis.Tags.Count()</span></div>
+                    <div class="card-body row py-2">
+                        @foreach (var tag in Model.ImageAnalysis.Tags)
+                        {
+                            if (tag.Name != null)
+                            {
+                                <div class="card col-auto card-shadow alert-primary p-2 mx-auto">@tag.Name</div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @*Tags End*@
+
+        @*Objects Start*@
+        @if (Model.ImageAnalysis.Objects != null && Model.ImageAnalysis.Objects.Count() > 0)
+        {
+            <div class="col-auto px-0 mx-auto my-1">
+                <div class="card mx-auto alert-primary card-shadow">
+                    <div class="card-header h4 text-center">Objects <span class="badge badge-primary">@Model.ImageAnalysis.Objects.Count()</span></div>
+                    <div class="card-body row py-2">
+                        @foreach (var obj in Model.ImageAnalysis.Objects)
+                        {
+                            if (obj.ObjectProperty != null)
+                            {
+                                <div class="card col-auto card-shadow alert-primary p-2 mx-auto">@obj.ObjectProperty</div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @*Objects End*@
+
+        @*Faces Start*@
+        @if (Model.ImageAnalysis.Faces != null && Model.ImageAnalysis.Faces.Count() > 0)
+        {
+            <div class="col-auto px-0 mx-auto my-1">
+                <div class="card mx-auto alert-primary card-shadow">
+                    <div class="card-header h4 text-center">Faces <span class="badge badge-primary">@Model.ImageAnalysis.Faces.Count()</span></div>
+                    <div class="card-body row py-2">
+                        @foreach (var face in Model.ImageAnalysis.Faces)
+                        {
+                            <div class="card col-auto card-shadow alert-primary p-2 mx-auto">@face.Gender - @face.Age</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @*Faces End*@
+
+    </div>
+    <!-- #endregion -->
+    @*Information*@
+    @*<div class="alert my-2 alert-warning alert-dismissible fade show" role="alert">
+        <small>Bitte vergessen Sie nicht, Ihr Bild nach der Analyse zu löschen, indem Sie auf die Schaltfläche "Löschen" klicken!</small>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>*@
+
+</div>

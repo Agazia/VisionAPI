@@ -30,6 +30,10 @@ namespace VisionAPI
             // MSVisionAPIService
             services.Configure<VisionAPICredentials>(Configuration.GetSection("MSVisionAPICredentials"));
             services.AddTransient<MSVisionAPIService>();
+
+            // MSTextToSpeechAPIService
+            services.Configure<TextToSpeechAPICredentials>(Configuration.GetSection("TextToSpeechAPICredentials"));
+            services.AddTransient<ITextToSpeech, TextToSpeechAPIService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

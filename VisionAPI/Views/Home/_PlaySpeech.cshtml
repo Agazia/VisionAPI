@@ -1,0 +1,14 @@
+﻿@model SpeechAnalyseVM
+
+
+<fieldset class="card-shadow border p-2">
+    <legend class="w-auto">Abspielen</legend>
+    <div class="px-3 mt-2">
+        <div class="form-group">
+            <audio id="audio" controls autoplay>
+                <source id="audiourl" src="@Model.Url" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+</fieldset>

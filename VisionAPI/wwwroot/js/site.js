@@ -6,7 +6,7 @@
 // Upload Profile Picture (Portrait)
 
 
-$(document).on('click', '.uploadpic', function () {
+function analyze_imgAndSpeech() {
     $('#loadingModal').modal('show');
     $('#modal-content').html(returnLoadingMsg('Das Bild wird analysiert'));
 
@@ -23,29 +23,28 @@ $(document).on('click', '.uploadpic', function () {
 
         data.append('picurl', picurl);
 
-        Example(data);
-        
-    } else if (picurl !== "")
-    {
+        $.when(show_result(data)).done(function () { delete_all() });
+
+    } else if (picurl !== "") {
         data.append('picurl', picurl);
-        Example(data);
+        show_result(data);
     } else {
         $('#modal-content').html(returnErrorMsg('No valid image/url were specified'));
     }
-});
+};
 
 
-function Example(data) {
+function show_result(data) {
 
     $.ajax({
-        url: "/Home/UploadLocal",
+        url: "/Home/AnalyzeImageAndSound",
         type: "POST",
         contentType: false,
         processData: false,
         data: data,
         success: function (message) {
             if (message.message == "Success") {
-                $('#res').load("/Home/LoadResult", message);
+                $('#resultsection').load("/Home/LoadResult", message);
                 $('#modal-content').html(returnSuccessMsg('Das Bild wurde analysiert!'));
                 $('#inputpic').val("");
                 $("#inputurl").val("");
@@ -63,16 +62,14 @@ function Example(data) {
 }
 
 
-$(document).on('click', '.deletepic', function () {
+function delete_img(url) {
 
     $('#loadingModal').modal('show');
     $('#modal-content').html(returnLoadingMsg('Das Bild wird gelöscht'));
 
-    var imgId = $('.imageai').attr('id');
-
     $.post('Home/DeletePicture',
         {
-            id: imgId
+            id: url
         },
         function (data, status) {
             if (status == 'success') {
@@ -86,7 +83,38 @@ $(document).on('click', '.deletepic', function () {
                 $('#modal-content').html(returnErrorMsg('An error occured while deleting the file!'));
             }
         });
-});
+};
+
+function delete_all() {
+    $.post('Home/DeleteAll', function (status) {
+
+    });
+};
+
+
+function analyze_speech() {
+
+    $('#loadingModal').modal('show');
+    $('#modal-content').html(returnLoadingMsg('Der Text wird umgewandelt'));
+
+    var msg = $('textarea#message').val();
+
+    $.post('Home/UploadSpeech', {
+        id: msg
+    }, function (data, status) {
+            if (status == 'success') {
+                if (!data) {
+                    $('#modal-content').html(returnErrorMsg('An error occured while analyzing the text!'));
+
+                } else {
+                    $('#playspeech').load("/Home/PlaySpeech", data);
+                    $('#loadingModal').modal('hide');
+                }
+            } else {
+                $('#modal-content').html(returnErrorMsg('An error occured while analyzing the text!'));
+            }
+    });
+};
 
 
 

@@ -1,0 +1,27 @@
+﻿@model SpeechAnalyseVM
+
+<div id="speechsection">
+    <fieldset class="card-shadow border p-2">
+        <legend class="w-auto">Text in Sprache umwandeln</legend>
+        <div class="px-3 mt-2">
+                <div class="row mx-auto mb-2">
+                    <div class="col-auto col-md-6 mx-auto">
+                        <fieldset class="card-shadow border p-2">
+                            <legend class="w-auto">Text eingeben</legend>
+                            <div class="px-3 mt-2">
+                                <div class="form-group">
+                                    <textarea id="message" asp-for="Content" class="alert-info w-100"></textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="playspeech" class="col-auto col-md-6 mx-auto">
+                        <partial name="_PlaySpeech" model="@Model" />
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a class="btn btn-outline-primary" href="javascript:analyze_speech();">Umwandeln</a>
+                </div>
+        </div>
+    </fieldset>
+</div>
