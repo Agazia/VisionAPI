@@ -46,7 +46,7 @@ namespace VisionAPI.Services
             }
             catch (Exception)
             {
-                speechModel.Message = $"Error: An error occured while analyzing the image.";
+                speechModel.Message = $"Error: An error occured while analyzing the text.";
             }
             return speechModel;
         }
