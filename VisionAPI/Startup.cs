@@ -31,6 +31,8 @@ namespace VisionAPI
             services.Configure<VisionAPICredentials>(Configuration.GetSection("MSVisionAPICredentials"));
             services.AddTransient<MSVisionAPIService>();
 
+            services.AddAntiforgery(o => o.SuppressXFrameOptionsHeader = true);
+
             // MSTextToSpeechAPIService
             services.Configure<TextToSpeechAPICredentials>(Configuration.GetSection("TextToSpeechAPICredentials"));
             services.AddTransient<ITextToSpeech, TextToSpeechAPIService>();
